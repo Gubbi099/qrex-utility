@@ -21,6 +21,15 @@ local i = 1
   end
 end
 
+local function isSnteChannel(str, tbl)
+    if(checkChannel(str)) then
+        local netStr = util.NetworkStringToID(str)
+        if(table.HasValue(tbl, util.NetworkIDToString(netStr + 1)) || table.HasValue(tbl, util.NetworkIDToString(netStr - 1)) ) then
+            return true
+        end
+    end
+end
+
 local function channelNil()
   if channel == "" then
     MsgC(Color(166, 222, 255), "No channel has been set. Please scan for available channels.\n")
@@ -52,6 +61,20 @@ for k,v in pairs(bdChannels) do
     end
   end
 end
+
+local function snteScan() 
+local found = false
+  for k, v in pairs(bdChannels) do
+    if(isSnteChannel(v, bdChannels)) then
+      MsgC(Color(166,222,255), "Possible fake channel: ", Color(155,155,155), v .."\n")
+      found = true
+    end
+  end
+  if(!found) then
+    MsgC(Color(166,222,255), "Didn't find anything. \n")  
+  end
+end
+
 
 local function luaRun(ply, cmd, args, argStr)
 if(!argStr) then return end
@@ -209,6 +232,7 @@ MsgC(Color(166, 222, 255), "Qrextomnia Utility has successfully initialized!\nTy
 addCommand("test", "Test", "Utility", testFunction)
 addCommand("help", "Shows you a list of commands and their description.", "Help", help)
 addCommand("pl_intensescan", "Launches an intense scan on the server (This can be risky due to discarding net messages).", "Payloads", intenseScan)
+addCommand("pl_sntescan", "Scans for possible fake channels.", "Payloads", snteScan)
 addCommand("pl_run", "Sends function to selected channel.", "Payloads", luaRun)
 addCommand("pl_run_cl", "Run a class on a target player.", "Payloads", runFuncClient, ACGetPlayers)
 addCommand("util_genpayload", "Takes one string argument as the channel identifier for the payload.", "Utility", generatePayload)
