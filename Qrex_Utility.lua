@@ -59,20 +59,28 @@ for k,v in pairs(bdChannels) do
     for _, q in pairs(vulChannel) do
     MsgC(Color(166, 222, 255), "Found channel: ", Color(155,155,155), q.name .."\n")
     end
+    Msg("\n")
+    MsgC(Color(166,222,255), "Total amount: ", Color(155,155,155), table.Count(vulChannel) .. "\n")
   end
 end
 
 local function snteScan() 
 local found = false
+local i = 0
   for k, v in pairs(bdChannels) do
     if(isSnteChannel(v, bdChannels)) then
       MsgC(Color(166,222,255), "Possible fake channel: ", Color(155,155,155), v .."\n")
       found = true
+      i = i + 1
     end
   end
   if(!found) then
-    MsgC(Color(166,222,255), "Didn't find anything. \n")  
+    MsgC(Color(166,222,255), "Didn't find anything. \n")
+    else
+    Msg("\n")
+    MsgC(Color(166,222,255), "Total amount: ", Color(155,155,155), i .."\n")
   end
+  
 end
 
 
