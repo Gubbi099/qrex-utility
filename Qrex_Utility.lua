@@ -28,6 +28,7 @@ local function isSnteChannel(str, tbl)
             return true
         end
     end
+  return false
 end
 
 local function channelNil()
