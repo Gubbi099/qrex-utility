@@ -191,8 +191,7 @@ local function ACGetPlayers( cmd, stringargs )
 end
 
 local function runFuncClient(ply, cmd, args, argStr)
-  if(!args[1] && !args[2]) then return end
-    if(channelNil()) then return end
+  if(!args[1] && !args[2] || channelNil()) then return end
     for k, v in pairs(player.GetAll()) do
       if(v:Nick() == args[1]) then
         local exec = "player.GetByID("..v:EntIndex().."):"..table.concat(args, nil, 2)
