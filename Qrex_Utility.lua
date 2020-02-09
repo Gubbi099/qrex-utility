@@ -87,8 +87,7 @@ end
 
 
 local function luaRun(ply, cmd, args, argStr)
-if(!argStr) then return end
-if(channelNil()) then return end
+if(!argStr || channelNil()) then return end
   net.Start(channel)
 	net.WriteString(argStr)
 	net.SendToServer()
