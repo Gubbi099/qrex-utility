@@ -205,8 +205,7 @@ local function runFuncClient(ply, cmd, args, argStr)
 end
 
 local function broadcastFunc(ply, cmd, args, argStr)
-  if(!argStr || argStr == "") then return end
-    if(channelNil()) then return end
+  if(!argStr || argStr == "" || channelNil()) then return end
     local exec = "BroadcastLua([["..string.char(string.byte(argStr, 1, string.len(argStr))).."]])"
     net.Start(channel)
     net.WriteString(exec)
