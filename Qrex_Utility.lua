@@ -36,6 +36,7 @@ local function channelNil()
     MsgC(Color(166, 222, 255), "No channel has been set. Please scan for available channels.\n")
     return true
   end
+  return false
 end
 
 local function dumpNet()
